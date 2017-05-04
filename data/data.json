@@ -1,0 +1,47 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "按钮",
+      "description": "按钮说明",
+      "usages": [
+        {"usagesId":1,"usageName":"基本用例xxx","usage":"基本用例说明xxxxxxx","htmlData":"<a class=\"btn btn-default\" href=\"#\" role=\"button\">Link</a>\n<button class=\"btn btn-default\" type=\"submit\">Button</button>\n<input class=\"btn btn-default\" type=\"button\" value=\"Input\">","jsData":"var a = \"test a\"","cssData":".btn {background-color: red;}"},
+        {
+          "usagesId": 2,
+          "usageName": "首选项用例",
+          "usage": "首选项用例说明",
+          "htmlData": "<button type=\"button\" class=\"btn btn-primary\">（首选项）Primary</button>",
+          "jsData": "var b = \"test\"",
+          "cssData": "#test {background-color: red;}"
+        },
+        {"usagesId":3,"usageName":"a","usage":"aaaa","htmlData":"<div>aaaaaa</div>","jsData":"","cssData":""}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "表单",
+      "description": "表单",
+      "usages": [
+        {
+          "usagesId": 1,
+          "usageName": "输入框",
+          "usage": "输入框",
+          "htmlData": "<input type=\"text\" class=\"form-control\" placeholder=\"Text input\">",
+          "jsData": "var a = \"test\"",
+          "cssData": "#test {background-color: red;}"
+        },
+        {
+          "usagesId": 2,
+          "usageName": "文本域",
+          "usage": "文本域",
+          "htmlData": "<textarea class=\"form-control\" rows=\"3\"></textarea>",
+          "jsData": "var a = \"test\"",
+          "cssData": "#test {background-color: red;}"
+        }
+      ]
+    },
+    {"id":3,"name":"链接","description":"aaaaa","usages":[
+      {"usagesId":1,"usageName":"1","usage":"1xxxxxx","htmlData":"<a href=\"www.baidu.com\"></a>","jsData":"","cssData":""}
+    ]}
+  ]
+}

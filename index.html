@@ -1,0 +1,542 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>component-repository</title>
+  <!-- 引入bootstrap -->
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+  <!-- 引入awesome图标 -->
+    <link rel="stylesheet" href="./font-awesome/css/font-awesome.min.css">
+  <!-- 引入treeview插件 -->
+    <script src="js/bootstrap-treeview.js"></script>
+   <!-- codemirror -->
+    <link rel=stylesheet href=codemirror/lib/codemirror.css>
+    <script src=codemirror/lib/codemirror.js></script>
+    <script src=codemirror/mode/xml/xml.js></script>
+    <script src=codemirror/mode/javascript/javascript.js></script>
+    <script src=codemirror/mode/css/css.js></script>
+    <script src=codemirror/mode/htmlmixed/htmlmixed.js></script>
+  <!-- 引入自定义 -->
+    <link rel="stylesheet" href="./css/component-repository-common.css">
+    <style type="text/css">
+        .CodeMirror {
+            height: auto;
+            background: transparent;
+        }
+        .btn-group{
+            margin-bottom: 20px;
+        }
+        #preview {
+            width: 100%;
+            height: 200px;
+            background-color: #FFFFFF;
+            padding: 5px;
+            /*overflow: auto;*/
+            border: none;
+        }
+    </style>
+    <script>
+        $(document).ready(function(){
+            // 获取组件数据
+            var compData = [];
+            // 当前组件数据
+            var currentData = new Object();
+            // 编辑组件
+            var editComp = false;
+            // 创建组件
+            var createComp = false;
+            // 编辑用例
+            var editUsage = false;
+            $.getJSON("data/data.json",function (data) {
+                compData = data.data;
+
+                var treeData = getTreeData(compData);
+                $('#tree').treeview({data: treeData});
+                /*点击树节点*/
+                $('#tree').on('nodeSelected',function(event, data) {
+                    // 选中子节点
+                    if(data.parentId != undefined){
+                        // 设置编辑状态
+                        editComp = false;
+                        createComp = false;
+                        editUsage = true;
+
+                        // 获取当前节点
+                        currentData = getCurrentData(data);
+
+                        // 设置数据
+                        setFormData(currentData);
+
+                        // 更新预览显示
+                        updatePreview();
+
+                    } else { // 选中父节点
+                        editComp = true;
+                        createComp = false;
+                        editUsage = false;
+                        // 获取当前节点,为父节点的第一个子节点
+                        if(data.nodes.length!=0){
+                            currentData = getCurrentData(data.nodes[0]);
+                            // 设置数据
+                            setFormData(currentData);
+                        } else {
+                            currentData.id = data.id;
+                            // 更新预览显示
+                            clearFormData();
+                        }
+
+                        updatePreview();
+                    }
+                    // 更新编辑状态
+                    updateEditStatus();
+                });
+            });
+
+            // 设置数据
+            function setFormData(currentData){
+                $("#name-forShow").html(currentData.name);
+                $("#description-forShow").html(currentData.description);
+                $("#usageName-forShow").html(currentData.usageName);
+                $("#usage-forShow").html(currentData.usage);
+
+                $("#name").val(currentData.name);
+                $("#description").val(currentData.description);
+                $("#usageName").val(currentData.usageName);
+                $("#usage").val(currentData.usage);
+
+                htmlEditor.setValue(currentData.htmlData);
+                javaScriptEditor.setValue(currentData.jsData);
+                cssEditor.setValue(currentData.cssData);
+            }
+
+            // 清空数据
+            function clearFormData(){
+                $("#name-forShow").html("");
+                $("#description-forShow").html("");
+                $("#usageName-forShow").html("");
+                $("#usage-forShow").html("");
+
+                $("#name").val("");
+                $("#description").val("");
+                $("#usageName").val("");
+                $("#usage").val("");
+
+                htmlEditor.setValue("");
+                javaScriptEditor.setValue("");
+                cssEditor.setValue("");
+            }
+
+            function getTreeData(compData) {
+                var nodelist = [];
+                for(var i=0;i<compData.length;i++){
+                    var node = new Object();
+                    node.selectable = true;
+                    node.id = compData[i].id;
+                    node.text = compData[i].name;
+                    node.description = compData[i].description;
+                    var nodes = [];
+                    for(var j=0;j<compData[i].usages.length;j++){
+                        var childNode = new Object();
+                        childNode.id = compData[i].usages[j].usagesId;
+                        childNode.text = compData[i].usages[j].usageName;
+                        childNode.usage = compData[i].usages[j].usage;
+                        childNode.htmlData = compData[i].usages[j].htmlData;
+                        childNode.jsData = compData[i].usages[j].jsData;
+                        childNode.cssData = compData[i].usages[j].cssData;
+                        nodes.push(childNode);
+                    }
+                    node.nodes = nodes;
+                    nodelist.push(node);
+                }
+                return nodelist;
+            };
+
+            function getCurrentData(node){
+                var parentNode = $('#tree').treeview('getParent', node);
+                var currentNode = new Object();
+                currentNode.id = parentNode.id;
+                currentNode.name = parentNode.text;
+                currentNode.description = parentNode.description;
+                currentNode.usagesId = node.id;
+                currentNode.usageName = node.text;
+                currentNode.usage = node.usage;
+                currentNode.htmlData = node.htmlData;
+                currentNode.jsData = node.jsData;
+                currentNode.cssData =node.cssData;
+                return currentNode;
+            }
+
+            var htmlEditor = CodeMirror.fromTextArea(document.getElementById("htmlEditor"), {
+                mode: 'text/html',
+                readOnly: true,
+                viewportMargin: Infinity
+            });
+            var javaScriptEditor = CodeMirror.fromTextArea(document.getElementById("javaScriptEditor"), {
+                mode: 'javascript',
+                readOnly: true,
+                viewportMargin: Infinity
+            });
+            var cssEditor = CodeMirror.fromTextArea(document.getElementById("cssEditor"), {
+                mode: 'css',
+                readOnly: true,
+                viewportMargin: Infinity
+            });
+
+            /*点击预览 编辑按钮*/
+            $("#editBar li").on("click",function () {
+                // 清除active状态
+                $("nav li").each(function () {
+                    $(this).removeAttr("class");
+                });
+                // 设置active状态
+                $(this).attr("class","active");
+                // 编辑按钮
+                updateEditStatus();
+
+            });
+
+            /*点击运行按钮*/
+            $("#run").on("click",function () {
+                updatePreview();
+            });
+
+            /*点击保存按钮*/
+            $("#save").on("click",function(){
+                saveData(currentData);
+                $('#jsonModal').modal('show');
+            });
+            
+            /*点击新建组件按钮*/
+            $("#createComp").on("click",function () {
+                // 设置编辑状态
+                createComp = true;
+                editComp = false;
+                editUsage = false;
+                clearFormData();
+                updateEditStatus();
+                updatePreview();
+            });
+
+            /*点击新建用例按钮*/
+            $("#createUsage").on("click",function () {
+                // 判断
+                var selectedNodes = $('#tree').treeview('getSelected');
+                if (selectedNodes.length==0||selectedNodes[0].parentId!=undefined){
+                    alert("请选择一个组件！");
+                } else {
+                    // 设置编辑状态
+                    createComp = false;
+                    editComp = false;
+                    editUsage = true;
+                    clearFormData();
+                    updateEditStatus();
+                    updatePreview();
+                }
+            });
+
+            /*点击删除按钮*/
+            $("#delete").on("click",function () {
+                // 判断
+                var selectedNodes = $('#tree').treeview('getSelected');
+                if (selectedNodes.length==0){
+                    alert("请选择一个组件或用例！");
+                } else{
+                    // 删除组件
+                    if (selectedNodes[0].parentId==undefined){
+                        var id = selectedNodes[0].id;
+                        alert("请删除data.json中id为"+id+"的组件!");
+                    } else {
+                        // 删除用例
+                        var parentNode = $('#tree').treeview('getParent', selectedNodes[0]);
+                        var id = parentNode.id;
+                        var usageId = selectedNodes[0].id;
+                        alert("请删除data.json中组件id为"+id+"usageId为"+usageId+"的用例！");
+                    }
+                }
+            });
+
+            // 更新界面编辑状态
+            function updateEditStatus(){
+                var buttonId = $("#editBar .active").attr("id");
+                if(buttonId=="edit" || buttonId=="createComp" || buttonId=="createUsage"){
+                    if(editComp || createComp){
+                        // 隐藏
+                        $("#name-forShow").addClass("hide");
+                        $("#description-forShow").addClass("hide");
+                        $("#usageName").addClass("hide");
+                        $("#usage").addClass("hide");
+                        // 显示
+                        $("#name").removeClass("hide");
+                        $("#description").removeClass("hide");
+                        $("#usageName-forShow").removeClass("hide");
+                        $("#usage-forShow").removeClass("hide");
+                        // 设置代码编辑非活性
+                        htmlEditor.setOption("readOnly",true);
+                        htmlEditor.setOption("lineNumbers",false);
+                        javaScriptEditor.setOption("readOnly",true);
+                        javaScriptEditor.setOption("lineNumbers",false);
+                        cssEditor.setOption("readOnly",true);
+                        cssEditor.setOption("lineNumbers",false);
+                        // 隐藏按钮组
+                        $(".btn-group").each(function(){
+                            $(this).css("display","none");
+                        });
+                    } else if (editUsage){
+                        // 隐藏
+                        $("#name").addClass("hide");
+                        $("#description").addClass("hide");
+                        $("#usageName-forShow").addClass("hide");
+                        $("#usage-forShow").addClass("hide");
+                        // 显示
+                        $("#name-forShow").removeClass("hide");
+                        $("#description-forShow").removeClass("hide");
+                        $("#usageName").removeClass("hide");
+                        $("#usage").removeClass("hide");
+                        // 设置代码编辑活性
+                        htmlEditor.setOption("readOnly",false);
+                        htmlEditor.setOption("lineNumbers",true);
+                        javaScriptEditor.setOption("readOnly",false);
+                        javaScriptEditor.setOption("lineNumbers",true);
+                        cssEditor.setOption("readOnly",false);
+                        cssEditor.setOption("lineNumbers",true);
+                        // 显示按钮组
+                        $(".btn-group").each(function(){
+                            $(this).css("display","inline-block");
+                        });
+                    }
+                    $("#operate").removeClass("hide");
+                    $("#save").removeClass("hide");
+                } else if (buttonId=="view") {
+                    // 显示forShow
+                    $(".forShow").each(function () {
+                        $(this).removeClass("hide");
+                    });
+                    // 隐藏form-control
+                    $("#editForm .form-control").each(function () {
+                        $(this).addClass("hide");
+                    });
+                    // 设置代码编辑非活性
+                    htmlEditor.setOption("readOnly",true);
+                    htmlEditor.setOption("lineNumbers",false);
+                    javaScriptEditor.setOption("readOnly",true);
+                    javaScriptEditor.setOption("lineNumbers",false);
+                    cssEditor.setOption("readOnly",true);
+                    cssEditor.setOption("lineNumbers",false);
+                    // 隐藏按钮组
+                    $(".btn-group").each(function(){
+                        $(this).css("display","none");
+                    });
+                    $("#operate").addClass("hide");
+                    $("#save").addClass("hide");
+                }
+            }
+
+            // 更新预览显示
+            function updatePreview() {
+                var iframeHead = document.getElementById('iframeHead');
+
+                var previewFrame = document.getElementById('preview');
+                var preview =  previewFrame.contentDocument ||  previewFrame.contentWindow.document;
+                preview.open();
+                preview.write(
+                        iframeHead.value
+                        + htmlEditor.getValue()
+                        + '\<script\>\n' + javaScriptEditor.getValue() + '\n\<\/script\>'
+                        + '\<style\>\n' + cssEditor.getValue() + '\n\<\/style\>');
+                preview.close();
+            }
+
+            // 保存数据
+            function saveData(currentData){
+                var jsonObject = new Object();
+                var jsonString = "";
+                // 保存用例
+                if(editUsage){
+                    var selectedNodes = $('#tree').treeview('getSelected');
+                    var createUsage = false;
+                    // 新建用例
+                    if(selectedNodes[0].parentId==undefined){
+                        createUsage = true;
+                        var childNodes = selectedNodes[0].nodes;
+                        if(childNodes.length==0){
+                            jsonObject.usagesId = 1;
+                        } else {
+                            var lastId = childNodes[childNodes.length-1].id;
+                            jsonObject.usagesId = lastId + 1;
+                        }
+
+                    } else { // 编辑用例
+                        jsonObject.usagesId = currentData.usagesId;
+                    }
+                    jsonObject.usageName = $("#usageName").val();
+                    jsonObject.usage = $("#usage").val();
+                    jsonObject.htmlData = htmlEditor.getValue();
+                    jsonObject.jsData = javaScriptEditor.getValue();
+                    jsonObject.cssData = cssEditor.getValue();
+                    jsonString = JSON.stringify(jsonObject);
+                    if (createUsage){
+                        $("#jsonModalTitle").html("请将下列内容复制到data.json中，添加到组件id为"+currentData.id+"的usages节点最后");
+                    } else {
+                        $("#jsonModalTitle").html("请将下列内容复制到data.json中，替换组件id为"+currentData.id+",usagesId为"+jsonObject.usagesId+"的内容");
+                    }
+
+                    $("#jsonContent").html(jsonString);
+                } else if(editComp){ // 编辑组件
+                    var name = $("#name").val();
+                    var description = $("#description").val();
+                    $("#jsonModalTitle").html("请将下列内容分别复制到data.json中，替换id为"+currentData.id+"的name和description属性");
+                    $("#jsonContent").html(name+"\n"+description);
+                } else if(createComp){ // 新增组件
+                    if(compData.length==0){
+                        jsonObject.id = 1;
+                    } else {
+                        var lastId = compData[compData.length-1].id;
+                        jsonObject.id = lastId+1;
+                    }
+                    jsonObject.name = $("#name").val();
+                    jsonObject.description = $("#description").val();
+                    jsonObject.usages = [];
+                    jsonString = JSON.stringify(jsonObject);
+                    if(!lastId){
+                        $("#jsonModalTitle").html("请将下列内容复制并添加到data.json的data中");
+                    } else {
+                        $("#jsonModalTitle").html("请将下列内容复制到data.json中，添加到id为"+lastId+"的组件之后");
+                    }
+                    $("#jsonContent").html(jsonString);
+                }
+            }
+        })
+    </script>
+
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="javascript:void(0)">组件模板库</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul id="editBar" class="nav navbar-nav">
+                <li class="active" id="view"><a href="javascript:void(0)"><i class="fa fa-eye"></i> 查看</a></li>
+                <li id="edit"><a href="javascript:void(0)"><i class="fa fa-edit"></i> 编辑</a></li>
+                <li class="dropdown hide" id="operate">
+                    <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">操作 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li id="createComp"><a href="javascript:void(0)">新增组件</a></li>
+                        <li id="createUsage"><a href="javascript:void(0)">新增用例</a></li>
+                        <li id="delete"><a href="javascript:void(0)">删除</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="hide"><a href="javascript:void(0)" id="save"><i class="fa fa-save"></i> 保存</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div style="position: fixed; top: 50px;left: 0;right: 0;bottom: 0px;">
+    <div class="container-fluid" style="height: 100%">
+      <div class="row" style="height: 100%">
+        <!-- 左侧内容 -->
+        <div class="col-md-3 cr-grid" style="height: 100%;">
+            <div id="treeContainer" style="overflow: auto;">
+                <div id="tree"></div>
+            </div>
+        </div>
+        <!-- 右侧内容 -->
+        <div class="col-md-9 cr-grid" style="height: 100%;overflow: auto">
+            <form id="editForm">
+                <div class="form-group">
+                    <input type="text" class="form-control hide" id="name" placeholder="请输入组件名">
+                </div>
+                <div class="form-group">
+                    <textarea id="description" class="form-control hide" rows="3" placeholder="请输入组件说明"></textarea>
+                </div>
+
+                <h1 id="name-forShow" class="forShow"></h1>
+                <p id="description-forShow" class="lead forShow"></p>
+
+                <div class="form-group">
+                    <input type="text" class="form-control hide" id="usageName" placeholder="请输入用例名">
+                </div>
+                <div class="form-group">
+                    <textarea id="usage" class="form-control hide" rows="3" placeholder="请输入实例说明"></textarea>
+                </div>
+
+                <h2 id="usageName-forShow" class="forShow"></h2>
+                <p id="usage-forShow" class="forShow"></p>
+
+                <!--组件示例-->
+                <div class="bs-example">
+
+                    <iframe id="preview"></iframe>
+
+                </div>
+                <!--编辑按钮组-->
+                <div class="btn-group" role="group" aria-label="..." style="display: none">
+                    <button id="run" type="button" class="btn btn-success"><i class="fa fa-play-circle"></i> 运行</button>
+                </div>
+                <!--代码示例-->
+                <figure class="highlight">
+                  <!--html代码示例-->
+                  <div class="code-example html-example" style="border-bottom: 1px solid #e1e1e8;">
+                      <textarea id="htmlEditor" name="htmlEditor"></textarea>
+                  </div>
+                  <!--js代码示例-->
+                  <div class="code-example js-example" style="border-bottom: 1px solid #e1e1e8;">
+                    <textarea id="javaScriptEditor" name="javaScriptEditor"></textarea>
+                  </div>
+                  <!--CSS代码示例-->
+                  <div class="code-example css-example" style="border-bottom: 1px solid #e1e1e8;">
+                    <textarea id="cssEditor" name="cssEditor"></textarea>
+                  </div>
+                </figure>
+            </form>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!--iframe head-->
+<textarea id="iframeHead" style="display: none">
+<head>
+    <meta charset="utf-8">
+    <title>component-preview</title>
+    <!-- 引入bootstrap -->
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <!-- 引入awesome图标 -->
+    <link rel="stylesheet" href="./font-awesome/css/font-awesome.min.css">
+</head>
+</textarea>
+
+<!-- json代码模态框 -->
+<div class="modal fade" id="jsonModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="jsonModalTitle">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                <textarea id="jsonContent" class="form-control" rows="10" readonly></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
