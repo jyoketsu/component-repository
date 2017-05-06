@@ -43,26 +43,6 @@
     content: "Example";
 }
 
-.btn-clipboard {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 10;
-    display: block;
-    padding: 5px 8px;
-    font-size: 12px;
-    color: #767676;
-    cursor: pointer;
-    background-color: #fff;
-    border: 1px solid #e1e1e8;
-    border-radius: 0 4px 0 4px;
-}
-
-.bs-example+.zero-clipboard .btn-clipboard {
-    top: -16px;
-    border-top-right-radius: 0;
-}
-
 .bs-example+.highlight, .bs-example+.btn-group+.highlight {
     margin: -15px -15px 15px;
     border-width: 0 0 1px;

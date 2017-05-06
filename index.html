@@ -30,7 +30,7 @@
         }
         #preview {
             width: 100%;
-            height: 200px;
+            height: 100px;
             background-color: #FFFFFF;
             padding: 5px;
             /*overflow: auto;*/
@@ -86,7 +86,6 @@
                             // 更新预览显示
                             clearFormData();
                         }
-
                         updatePreview();
                     }
                     // 更新编辑状态
@@ -335,6 +334,9 @@
 
             // 更新预览显示
             function updatePreview() {
+                // 重置iframe高度
+                $("#preview").css("height",100);
+
                 var iframeHead = document.getElementById('iframeHead');
 
                 var previewFrame = document.getElementById('preview');
@@ -346,6 +348,38 @@
                         + '\<script\>\n' + javaScriptEditor.getValue() + '\n\<\/script\>'
                         + '\<style\>\n' + cssEditor.getValue() + '\n\<\/style\>');
                 preview.close();
+
+                // iframe高度自适应
+                setTimeout(function () {
+                    if(hasModal(htmlEditor.getValue())){
+                        $("#preview").animate({"height":400},"slow");
+                    } else {
+                        var iframeHeight = previewFrame.contentDocument.body.offsetHeight+20;
+                        if (iframeHeight>100){
+                            $("#preview").animate({"height":iframeHeight},"slow");
+                        }
+                    }
+                },200)
+
+            }
+
+            // 模板中是否含有模态框的使用
+            function hasModal(html){
+                if(html.indexOf("data-toggle=\"modal\"")==-1){
+                    return false;
+                }else {
+                    return true;
+                }
+            }
+
+            function iframeAutoFit(iframeObj){
+                setTimeout(function(){
+                    if(!iframeObj) {
+                        return;
+                    }else {
+                        iframeObj.height=(iframeObj.Document?iframeObj.Document.body.scrollHeight:iframeObj.contentDocument.body.offsetHeight);
+                    }
+                },200)
             }
 
             // 保存数据
