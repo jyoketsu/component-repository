@@ -1,24 +1,26 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>component-repository</title>
-  <!-- 引入bootstrap -->
-    <link rel="stylesheet" href="./css/bootstrap.min.css">
-    <script src="./js/jquery.min.js"></script>
-    <script src="./js/bootstrap.min.js"></script>
-  <!-- 引入awesome图标 -->
-    <link rel="stylesheet" href="./font-awesome/css/font-awesome.min.css">
-  <!-- 引入treeview插件 -->
-    <script src="js/bootstrap-treeview.js"></script>
-   <!-- codemirror -->
-    <link rel=stylesheet href=codemirror/lib/codemirror.css>
-    <script src=codemirror/lib/codemirror.js></script>
-    <script src=codemirror/mode/xml/xml.js></script>
-    <script src=codemirror/mode/javascript/javascript.js></script>
-    <script src=codemirror/mode/css/css.js></script>
-    <script src=codemirror/mode/htmlmixed/htmlmixed.js></script>
-  <!-- 引入自定义 -->
+    <meta charset="utf-8">
+    <title>component-repository</title>
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css">
+    <script src="https://cdn.bootcss.com/jquery/2.1.0/jquery.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <!-- awesome图标 -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css">
+
+    <!-- treeview插件 -->
+    <script src="https://cdn.bootcss.com/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
+    <!-- codemirror -->
+    <link rel=stylesheet href="https://cdn.bootcss.com/codemirror/5.25.2/codemirror.css">
+    <script src="https://cdn.bootcss.com/codemirror/5.25.2/codemirror.js"></script>
+    <script src="https://cdn.bootcss.com/codemirror/5.25.2/mode/xml/xml.js"></script>
+    <script src="https://cdn.bootcss.com/codemirror/5.25.2/mode/javascript/javascript.js"></script>
+    <script src="https://cdn.bootcss.com/codemirror/5.25.2/mode/css/css.js"></script>
+    <script src="https://cdn.bootcss.com/codemirror/5.25.2/mode/htmlmixed/htmlmixed.js"></script>
+
+    <!-- 引入自定义 -->
     <link rel="stylesheet" href="./css/component-repository-common.css">
     <style type="text/css">
         .CodeMirror {
@@ -49,6 +51,28 @@
             var createComp = false;
             // 编辑用例
             var editUsage = false;
+
+            var htmlEditor = CodeMirror.fromTextArea(document.getElementById("htmlEditor"), {
+                mode: 'text/html',
+                readOnly: true,
+                viewportMargin: Infinity
+            });
+            var javaScriptEditor = CodeMirror.fromTextArea(document.getElementById("javaScriptEditor"), {
+                mode: 'javascript',
+                readOnly: true,
+                viewportMargin: Infinity
+            });
+            var cssEditor = CodeMirror.fromTextArea(document.getElementById("cssEditor"), {
+                mode: 'css',
+                readOnly: true,
+                viewportMargin: Infinity
+            });
+            var dataEditor = CodeMirror.fromTextArea(document.getElementById("dataEditor"), {
+                mode: 'javascript',
+                readOnly: true,
+                viewportMargin: Infinity
+            });
+
             $.getJSON("data/data.json",function (data) {
                 compData = data.data;
 
@@ -93,96 +117,6 @@
                 });
             });
 
-            // 设置数据
-            function setFormData(currentData){
-                $("#name-forShow").html(currentData.name);
-                $("#description-forShow").html(currentData.description);
-                $("#usageName-forShow").html(currentData.usageName);
-                $("#usage-forShow").html(currentData.usage);
-
-                $("#name").val(currentData.name);
-                $("#description").val(currentData.description);
-                $("#usageName").val(currentData.usageName);
-                $("#usage").val(currentData.usage);
-
-                htmlEditor.setValue(currentData.htmlData);
-                javaScriptEditor.setValue(currentData.jsData);
-                cssEditor.setValue(currentData.cssData);
-            }
-
-            // 清空数据
-            function clearFormData(){
-                $("#name-forShow").html("");
-                $("#description-forShow").html("");
-                $("#usageName-forShow").html("");
-                $("#usage-forShow").html("");
-
-                $("#name").val("");
-                $("#description").val("");
-                $("#usageName").val("");
-                $("#usage").val("");
-
-                htmlEditor.setValue("");
-                javaScriptEditor.setValue("");
-                cssEditor.setValue("");
-            }
-
-            function getTreeData(compData) {
-                var nodelist = [];
-                for(var i=0;i<compData.length;i++){
-                    var node = new Object();
-                    node.selectable = true;
-                    node.id = compData[i].id;
-                    node.text = compData[i].name;
-                    node.description = compData[i].description;
-                    var nodes = [];
-                    for(var j=0;j<compData[i].usages.length;j++){
-                        var childNode = new Object();
-                        childNode.id = compData[i].usages[j].usagesId;
-                        childNode.text = compData[i].usages[j].usageName;
-                        childNode.usage = compData[i].usages[j].usage;
-                        childNode.htmlData = compData[i].usages[j].htmlData;
-                        childNode.jsData = compData[i].usages[j].jsData;
-                        childNode.cssData = compData[i].usages[j].cssData;
-                        nodes.push(childNode);
-                    }
-                    node.nodes = nodes;
-                    nodelist.push(node);
-                }
-                return nodelist;
-            };
-
-            function getCurrentData(node){
-                var parentNode = $('#tree').treeview('getParent', node);
-                var currentNode = new Object();
-                currentNode.id = parentNode.id;
-                currentNode.name = parentNode.text;
-                currentNode.description = parentNode.description;
-                currentNode.usagesId = node.id;
-                currentNode.usageName = node.text;
-                currentNode.usage = node.usage;
-                currentNode.htmlData = node.htmlData;
-                currentNode.jsData = node.jsData;
-                currentNode.cssData =node.cssData;
-                return currentNode;
-            }
-
-            var htmlEditor = CodeMirror.fromTextArea(document.getElementById("htmlEditor"), {
-                mode: 'text/html',
-                readOnly: true,
-                viewportMargin: Infinity
-            });
-            var javaScriptEditor = CodeMirror.fromTextArea(document.getElementById("javaScriptEditor"), {
-                mode: 'javascript',
-                readOnly: true,
-                viewportMargin: Infinity
-            });
-            var cssEditor = CodeMirror.fromTextArea(document.getElementById("cssEditor"), {
-                mode: 'css',
-                readOnly: true,
-                viewportMargin: Infinity
-            });
-
             /*点击预览 编辑按钮*/
             $("#editBar li").on("click",function () {
                 // 清除active状态
@@ -206,7 +140,7 @@
                 saveData(currentData);
                 $('#jsonModal').modal('show');
             });
-            
+
             /*点击新建组件按钮*/
             $("#createComp").on("click",function () {
                 // 设置编辑状态
@@ -256,6 +190,109 @@
                 }
             });
 
+            // 设置数据
+            function setFormData(currentData){
+
+                $("#name-forShow").html(currentData.name);
+                $("#description-forShow").html(toDisplayData(currentData.description));
+                $("#usageName-forShow").html(currentData.usageName);
+                $("#usage-forShow").html(toDisplayData(currentData.usage));
+
+                $("#name").val(currentData.name);
+                $("#description").val(currentData.description);
+                $("#usageName").val(currentData.usageName);
+                $("#usage").val(currentData.usage);
+
+                htmlEditor.setValue(currentData.htmlData);
+                javaScriptEditor.setValue(currentData.jsData);
+                cssEditor.setValue(currentData.cssData);
+                dataEditor.setValue(currentData.dataStructure);
+            }
+
+            // 清空数据
+            function clearFormData(){
+                $("#name-forShow").html("");
+                $("#description-forShow").html("");
+                $("#usageName-forShow").html("");
+                $("#usage-forShow").html("");
+
+                $("#name").val("");
+                $("#description").val("");
+                $("#usageName").val("");
+                $("#usage").val("");
+
+                htmlEditor.setValue("");
+                javaScriptEditor.setValue("");
+                cssEditor.setValue("");
+                dataEditor.setValue("");
+            }
+
+            function getTreeData(compData) {
+                var nodelist = [];
+                for(var i=0;i<compData.length;i++){
+                    var node = new Object();
+                    node.selectable = true;
+                    node.id = compData[i].id;
+                    node.text = compData[i].name;
+                    node.description = compData[i].description;
+                    var nodes = [];
+                    for(var j=0;j<compData[i].usages.length;j++){
+                        var childNode = new Object();
+                        childNode.id = compData[i].usages[j].usagesId;
+                        childNode.text = compData[i].usages[j].usageName;
+                        childNode.usage = compData[i].usages[j].usage;
+                        childNode.htmlData = compData[i].usages[j].htmlData;
+                        childNode.jsData = compData[i].usages[j].jsData;
+                        childNode.cssData = compData[i].usages[j].cssData;
+                        childNode.dataStructure = compData[i].usages[j].dataStructure;
+                        nodes.push(childNode);
+                    }
+                    node.nodes = nodes;
+                    nodelist.push(node);
+                }
+                return nodelist;
+            };
+
+            function getCurrentData(node){
+                var parentNode = $('#tree').treeview('getParent', node);
+                var currentNode = new Object();
+                currentNode.id = parentNode.id;
+                currentNode.name = parentNode.text;
+                currentNode.description = parentNode.description;
+                currentNode.usagesId = node.id;
+                currentNode.usageName = node.text;
+                currentNode.usage = node.usage;
+                currentNode.htmlData = node.htmlData;
+                currentNode.jsData = node.jsData;
+                currentNode.cssData =node.cssData;
+                currentNode.dataStructure =node.dataStructure;
+                return currentNode;
+            }
+
+            // 将文本内容转换成用于显示的内容。
+            function toDisplayData(data){
+                var displayData = data;
+                // 有html标签，替换转义字符
+                displayData = displayData.replace(/</g,"&lt;");
+                displayData = displayData.replace(/>/g,"&gt;");
+                // ``包含代码文本，替换成能显示的内容
+                var matched = data.match(/`/g);
+                if(matched!=null){
+                    for(var i= 0;i<matched.length;i++){
+                        // 标签头
+                        if(i%2==0){
+                            displayData = displayData.replace(/`/,"<code>");
+                        } else {
+                            // 标签尾
+                            displayData = displayData.replace(/`/,"</code>");
+                        }
+                    }
+                }
+                // 换行转义符替换成换行标签
+                displayData = displayData.replace(/\n/g,"<br/>");
+                return displayData;
+            }
+
             // 更新界面编辑状态
             function updateEditStatus(){
                 var buttonId = $("#editBar .active").attr("id");
@@ -278,6 +315,8 @@
                         javaScriptEditor.setOption("lineNumbers",false);
                         cssEditor.setOption("readOnly",true);
                         cssEditor.setOption("lineNumbers",false);
+                        dataEditor.setOption("readOnly",true);
+                        dataEditor.setOption("lineNumbers",false);
                         // 隐藏按钮组
                         $(".btn-group").each(function(){
                             $(this).css("display","none");
@@ -300,6 +339,8 @@
                         javaScriptEditor.setOption("lineNumbers",true);
                         cssEditor.setOption("readOnly",false);
                         cssEditor.setOption("lineNumbers",true);
+                        dataEditor.setOption("readOnly",false);
+                        dataEditor.setOption("lineNumbers",true);
                         // 显示按钮组
                         $(".btn-group").each(function(){
                             $(this).css("display","inline-block");
@@ -323,6 +364,8 @@
                     javaScriptEditor.setOption("lineNumbers",false);
                     cssEditor.setOption("readOnly",true);
                     cssEditor.setOption("lineNumbers",false);
+                    dataEditor.setOption("readOnly",true);
+                    dataEditor.setOption("lineNumbers",false);
                     // 隐藏按钮组
                     $(".btn-group").each(function(){
                         $(this).css("display","none");
@@ -372,16 +415,6 @@
                 }
             }
 
-            function iframeAutoFit(iframeObj){
-                setTimeout(function(){
-                    if(!iframeObj) {
-                        return;
-                    }else {
-                        iframeObj.height=(iframeObj.Document?iframeObj.Document.body.scrollHeight:iframeObj.contentDocument.body.offsetHeight);
-                    }
-                },200)
-            }
-
             // 保存数据
             function saveData(currentData){
                 var jsonObject = new Object();
@@ -409,6 +442,7 @@
                     jsonObject.htmlData = htmlEditor.getValue();
                     jsonObject.jsData = javaScriptEditor.getValue();
                     jsonObject.cssData = cssEditor.getValue();
+                    jsonObject.dataStructure = dataEditor.getValue();
                     jsonString = JSON.stringify(jsonObject);
                     if (createUsage){
                         $("#jsonModalTitle").html("请将下列内容复制到data.json中，添加到组件id为"+currentData.id+"的usages节点最后");
@@ -418,10 +452,12 @@
 
                     $("#jsonContent").html(jsonString);
                 } else if(editComp){ // 编辑组件
-                    var name = $("#name").val();
-                    var description = $("#description").val();
+                    var nameObject = new Object();
+                    var descriptionObject = new Object();
+                    nameObject.name = $("#name").val();
+                    descriptionObject.description = $("#description").val();
                     $("#jsonModalTitle").html("请将下列内容分别复制到data.json中，替换id为"+currentData.id+"的name和description属性");
-                    $("#jsonContent").html(name+"\n"+description);
+                    $("#jsonContent").html(JSON.stringify(nameObject)+"\n\n"+JSON.stringify(descriptionObject));
                 } else if(createComp){ // 新增组件
                     if(compData.length==0){
                         jsonObject.id = 1;
@@ -471,7 +507,7 @@
                     </ul>
                 </li>
             </ul>
-            <ul class="nav navbar-nav navbar-right">
+            <ul id="saveBar" class="nav navbar-nav">
                 <li class="hide"><a href="javascript:void(0)" id="save"><i class="fa fa-save"></i> 保存</a></li>
             </ul>
         </div>
@@ -493,7 +529,7 @@
                     <input type="text" class="form-control hide" id="name" placeholder="请输入组件名">
                 </div>
                 <div class="form-group">
-                    <textarea id="description" class="form-control hide" rows="3" placeholder="请输入组件说明"></textarea>
+                    <textarea id="description" class="form-control hide" rows="3" placeholder="请输入组件说明,代码文本请用``包围"></textarea>
                 </div>
 
                 <h1 id="name-forShow" class="forShow"></h1>
@@ -503,7 +539,7 @@
                     <input type="text" class="form-control hide" id="usageName" placeholder="请输入用例名">
                 </div>
                 <div class="form-group">
-                    <textarea id="usage" class="form-control hide" rows="3" placeholder="请输入实例说明"></textarea>
+                    <textarea id="usage" class="form-control hide" rows="3" placeholder="请输入实例说明,代码文本请用``包围"></textarea>
                 </div>
 
                 <h2 id="usageName-forShow" class="forShow"></h2>
@@ -533,6 +569,10 @@
                   <div class="code-example css-example" style="border-bottom: 1px solid #e1e1e8;">
                     <textarea id="cssEditor" name="cssEditor"></textarea>
                   </div>
+                  <!--组件数据说明-->
+                  <div class="code-example data-structure" style="border-bottom: 1px solid #e1e1e8;">
+                      <textarea id="dataEditor" name="dataEditor"></textarea>
+                  </div>
                 </figure>
             </form>
         </div>
@@ -545,12 +585,12 @@
 <head>
     <meta charset="utf-8">
     <title>component-preview</title>
-    <!-- 引入bootstrap -->
-    <link rel="stylesheet" href="./css/bootstrap.min.css">
-    <script src="./js/jquery.min.js"></script>
-    <script src="./js/bootstrap.min.js"></script>
-    <!-- 引入awesome图标 -->
-    <link rel="stylesheet" href="./font-awesome/css/font-awesome.min.css">
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css">
+    <script src="https://cdn.bootcss.com/jquery/2.1.0/jquery.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <!-- awesome图标 -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css">
     <!--引入nest标准-->
     <link rel="stylesheet" href="./standard/css/nest.css">
 </head>

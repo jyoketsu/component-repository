@@ -84,6 +84,10 @@
     content: "CSS代码示例：" !important;
 }
 
+.data-structure:after {
+    content: "组件数据说明：" !important;
+}
+
 .code-example:after {
     position: absolute;
     top: 0px;
