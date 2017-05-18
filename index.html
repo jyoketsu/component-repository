@@ -22,6 +22,7 @@
 
     <!-- 引入自定义 -->
     <link rel="stylesheet" href="./css/component-repository-common.css">
+    <link rel="stylesheet" href="./standard/css/nest.css">
     <style type="text/css">
         .CodeMirror {
             height: auto;
@@ -394,11 +395,11 @@
                 // iframe高度自适应
                 setTimeout(function () {
                     if(hasModal(htmlEditor.getValue())){
-                        $("#preview").animate({"height":400},"slow");
+                        $("#preview").css({"height":400},"slow");
                     } else {
                         var iframeHeight = previewFrame.contentDocument.body.offsetHeight+20;
                         if (iframeHeight>100){
-                            $("#preview").animate({"height":iframeHeight},"slow");
+                            $("#preview").css({"height":iframeHeight},"slow");
                         }
                     }
                 },200)
@@ -482,7 +483,7 @@
 
 </head>
 <body>
-<nav class="navbar navbar-default navbar-fixed-top">
+<nav class="navbar navbar-default navbar-fixed-top nestToolbar">
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -491,7 +492,12 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="javascript:void(0)">组件模板库</a>
+            <a class="navbar-brand nest-logo" href="javascript:void(0)">
+                <img alt="Brand" src="standard/image/focusight-logo.png">
+            </a>
+            <a class="navbar-brand" href="javascript:void(0)">
+                Nest UI标准
+            </a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul id="editBar" class="nav navbar-nav">
@@ -517,7 +523,7 @@
       <div class="row" style="height: 100%">
         <!-- 左侧内容 -->
         <div class="col-md-3 cr-grid" style="height: 100%;">
-            <div id="treeContainer" style="overflow: auto;">
+            <div id="treeContainer" style="height:100%; overflow: auto;">
                 <div id="tree"></div>
             </div>
         </div>
