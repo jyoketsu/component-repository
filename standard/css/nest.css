@@ -51,6 +51,7 @@ h4.nest-large-font,.nest-large-font{
 }
 .nest-small-tab>.tab-content{
     font-size: 10px;
+    padding-top: 5px;
 }
 .nest-small-tab>.tab-content label{
     font-weight: normal;
@@ -95,7 +96,7 @@ h4.nest-large-font,.nest-large-font{
 
 /*导航条图标样式*/
 .nestToolbar .navbar-brand img{
-    margin-top: -8px;
+    margin-top: -10px;
 }
 
 /*图标样式*/
@@ -152,12 +153,9 @@ h4.nest-large-font,.nest-large-font{
 }
 
 /*存放tab导航logo的链接*/
-.nest-tab-navbar .nest-tab-nav-logo{
-    padding: 3px 15px 0px 15px;
+.nest-tab-navbar .nest-logo{
+    padding: 2px 15px 0px 15px;
     cursor: default;
-}
-/*tab导航logo高度*/
-.nest-tab-navbar ul li a img{
 }
 
 /*导航条 因为和tab合并了，所以取消自身的边框*/
