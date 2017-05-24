@@ -20,9 +20,10 @@
     <script src="https://cdn.bootcss.com/codemirror/5.25.2/mode/css/css.js"></script>
     <script src="https://cdn.bootcss.com/codemirror/5.25.2/mode/htmlmixed/htmlmixed.js"></script>
 
-    <!-- 引入自定义 -->
     <link rel="stylesheet" href="./css/component-repository-common.css">
+    <!-- nest样式 -->
     <link rel="stylesheet" href="./standard/css/nest.css">
+    <script src="./standard/js/nest.js"></script>
     <style type="text/css">
         .CodeMirror {
             height: auto;
@@ -290,6 +291,8 @@
                 }
                 // 换行转义符替换成换行标签
                 displayData = displayData.replace(/\n/g,"<br/>");
+                // 替换空格
+                displayData = displayData.replace(/\s/g,"&nbsp;");
                 return displayData;
             }
 
@@ -483,103 +486,110 @@
 
 </head>
 <body>
-<nav class="navbar navbar-default navbar-fixed-top nestToolbar">
+<div class="nest-head">
+    <nav class="navbar navbar-default nestToolbar">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand nest-logo" href="javascript:void(0)">
+                    <img alt="Brand" src="standard/image/focusight-logo.png">
+                </a>
+                <a class="navbar-brand" href="javascript:void(0)">
+                    Nest UI标准
+                </a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul id="editBar" class="nav navbar-nav">
+                    <li class="active" id="view"><a href="javascript:void(0)"><i class="fa fa-eye"></i> 查看</a></li>
+                    <li id="edit"><a href="javascript:void(0)"><i class="fa fa-edit"></i> 编辑</a></li>
+                    <li class="dropdown hide" id="operate">
+                        <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">操作 <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li id="createComp"><a href="javascript:void(0)">新增组件</a></li>
+                            <li id="createUsage"><a href="javascript:void(0)">新增用例</a></li>
+                            <li id="delete"><a href="javascript:void(0)">删除</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul id="saveBar" class="nav navbar-nav">
+                    <li class="hide"><a href="javascript:void(0)" id="save"><i class="fa fa-save"></i> 保存</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<div class="nest-content">
     <div class="container-fluid">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand nest-logo" href="javascript:void(0)">
-                <img alt="Brand" src="standard/image/focusight-logo.png">
-            </a>
-            <a class="navbar-brand" href="javascript:void(0)">
-                Nest UI标准
-            </a>
-        </div>
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul id="editBar" class="nav navbar-nav">
-                <li class="active" id="view"><a href="javascript:void(0)"><i class="fa fa-eye"></i> 查看</a></li>
-                <li id="edit"><a href="javascript:void(0)"><i class="fa fa-edit"></i> 编辑</a></li>
-                <li class="dropdown hide" id="operate">
-                    <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">操作 <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li id="createComp"><a href="javascript:void(0)">新增组件</a></li>
-                        <li id="createUsage"><a href="javascript:void(0)">新增用例</a></li>
-                        <li id="delete"><a href="javascript:void(0)">删除</a></li>
-                    </ul>
-                </li>
-            </ul>
-            <ul id="saveBar" class="nav navbar-nav">
-                <li class="hide"><a href="javascript:void(0)" id="save"><i class="fa fa-save"></i> 保存</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
-<div style="position: fixed; top: 50px;left: 0;right: 0;bottom: 0px;">
-    <div class="container-fluid" style="height: 100%">
-      <div class="row" style="height: 100%">
+      <div class="row">
         <!-- 左侧内容 -->
-        <div class="col-md-3 cr-grid" style="height: 100%;">
-            <div id="treeContainer" style="height:100%; overflow: auto;">
-                <div id="tree"></div>
+        <div class="col-md-3 nestCol">
+            <div class="nest-section">
+                <div id="treeContainer" style="height:100%; overflow: auto;">
+                    <div id="tree"></div>
+                </div>
             </div>
         </div>
         <!-- 右侧内容 -->
-        <div class="col-md-9 cr-grid" style="height: 100%;overflow: auto">
-            <form id="editForm">
-                <div class="form-group">
-                    <input type="text" class="form-control hide" id="name" placeholder="请输入组件名">
-                </div>
-                <div class="form-group">
-                    <textarea id="description" class="form-control hide" rows="3" placeholder="请输入组件说明,代码文本请用``包围"></textarea>
-                </div>
+        <div class="col-md-9 nestCol">
+            <div class="nest-section">
+                <form id="editForm">
+                    <div class="form-group">
+                        <input type="text" class="form-control hide" id="name" placeholder="请输入组件名">
+                    </div>
+                    <div class="form-group">
+                        <textarea id="description" class="form-control hide" rows="3" placeholder="请输入组件说明,代码文本请用``包围"></textarea>
+                    </div>
 
-                <h1 id="name-forShow" class="forShow"></h1>
-                <p id="description-forShow" class="lead forShow"></p>
+                    <h1 id="name-forShow" class="forShow"></h1>
+                    <p id="description-forShow" class="lead forShow"></p>
 
-                <div class="form-group">
-                    <input type="text" class="form-control hide" id="usageName" placeholder="请输入用例名">
-                </div>
-                <div class="form-group">
-                    <textarea id="usage" class="form-control hide" rows="3" placeholder="请输入实例说明,代码文本请用``包围"></textarea>
-                </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control hide" id="usageName" placeholder="请输入用例名">
+                    </div>
+                    <div class="form-group">
+                        <textarea id="usage" class="form-control hide" rows="3" placeholder="请输入实例说明,代码文本请用``包围"></textarea>
+                    </div>
 
-                <h2 id="usageName-forShow" class="forShow"></h2>
-                <p id="usage-forShow" class="forShow"></p>
+                    <h2 id="usageName-forShow" class="forShow"></h2>
+                    <p id="usage-forShow" class="forShow"></p>
 
-                <!--组件示例-->
-                <div class="bs-example">
+                    <!--组件示例-->
+                    <div class="bs-example">
 
-                    <iframe id="preview"></iframe>
+                        <iframe id="preview"></iframe>
 
-                </div>
-                <!--编辑按钮组-->
-                <div class="btn-group" role="group" aria-label="..." style="display: none">
-                    <button id="run" type="button" class="btn btn-success"><i class="fa fa-play-circle"></i> 运行</button>
-                </div>
-                <!--代码示例-->
-                <figure class="highlight">
-                  <!--html代码示例-->
-                  <div class="code-example html-example" style="border-bottom: 1px solid #e1e1e8;">
-                      <textarea id="htmlEditor" name="htmlEditor"></textarea>
-                  </div>
-                  <!--js代码示例-->
-                  <div class="code-example js-example" style="border-bottom: 1px solid #e1e1e8;">
-                    <textarea id="javaScriptEditor" name="javaScriptEditor"></textarea>
-                  </div>
-                  <!--CSS代码示例-->
-                  <div class="code-example css-example" style="border-bottom: 1px solid #e1e1e8;">
-                    <textarea id="cssEditor" name="cssEditor"></textarea>
-                  </div>
-                  <!--组件数据说明-->
-                  <div class="code-example data-structure" style="border-bottom: 1px solid #e1e1e8;">
-                      <textarea id="dataEditor" name="dataEditor"></textarea>
-                  </div>
-                </figure>
-            </form>
+                    </div>
+                    <!--编辑按钮组-->
+                    <div class="btn-group" role="group" aria-label="..." style="display: none">
+                        <button id="run" type="button" class="btn btn-success"><i class="fa fa-play-circle"></i> 运行</button>
+                    </div>
+                    <!--代码示例-->
+                    <figure class="highlight">
+                        <!--html代码示例-->
+                        <div class="code-example html-example" style="border-bottom: 1px solid #e1e1e8;">
+                            <textarea id="htmlEditor" name="htmlEditor"></textarea>
+                        </div>
+                        <!--js代码示例-->
+                        <div class="code-example js-example" style="border-bottom: 1px solid #e1e1e8;">
+                            <textarea id="javaScriptEditor" name="javaScriptEditor"></textarea>
+                        </div>
+                        <!--CSS代码示例-->
+                        <div class="code-example css-example" style="border-bottom: 1px solid #e1e1e8;">
+                            <textarea id="cssEditor" name="cssEditor"></textarea>
+                        </div>
+                        <!--组件数据说明-->
+                        <div class="code-example data-structure" style="border-bottom: 1px solid #e1e1e8;">
+                            <textarea id="dataEditor" name="dataEditor"></textarea>
+                        </div>
+                    </figure>
+                </form>
+            </div>
         </div>
       </div>
     </div>
@@ -598,6 +608,12 @@
     <link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css">
     <!--引入nest标准-->
     <link rel="stylesheet" href="./standard/css/nest.css">
+    <script src="./standard/js/nest.js"></script>
+    <style>
+        body{
+            background-color: #FFFFFF;
+        }
+    </style>
 </head>
 </textarea>
 

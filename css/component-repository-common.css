@@ -99,17 +99,8 @@
     content: "Example";
 }
 
-/*组件代码编辑*/
-body{
-    background-color: #f5f8fa;
-}
-
 /*圆角边框*/
 .radiusBorder{
     border: 1px solid #ddd;
     border-radius: 4px;
-}
-
-.cr-grid {
-    padding: 10px;
 }
